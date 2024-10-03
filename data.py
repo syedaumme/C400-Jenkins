@@ -19,7 +19,7 @@
 # count = 0
 # data=list(data_content)
 # for row in data:
-#     if row[1] == 'Brooklyn':  
+#     if row[1] == '"Brooklyn"':  
 #         count += 1
 
      
