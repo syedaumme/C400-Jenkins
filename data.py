@@ -1,74 +1,42 @@
-# import requests
-
-# data= requests.get('https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv')
-
-# # Convert the CSV content to a list of rows
-# data_content =  data.text.splitlines()
-
-# total_rows = len(data_content)-1
-# unique_boroughs = set()
-
-
-
-# for row in data_content: 
-    
-#     columns = row.split(',')
-#     borough = columns[1].strip()
-#     unique_boroughs.add(borough) 
-
-# count = 0
-# data=list(data_content)
-# for row in data:
-#     if row[1] == '"Brooklyn"':  
-#         count += 1
-
-     
-
-# # Sort unique boroughs 
-# unique_boroughs = sorted(unique_boroughs)
-
-# output_file = r'/root/taxi_zone_output.txt'
-# with open(output_file, 'w') as file:
-#     file.write(f"Total number of rows: {total_rows}\n")
-#     file.write(f"Unique boroughs (sorted): {unique_boroughs}\n")
-#     file.write(f"Number of records for Brooklyn: {count}\n")
-
-# print(f"Total number of rows: {total_rows}\n")
-# print(f"Unique boroughs (sorted): {unique_boroughs}\n")
-# print(f"Number of records for Brooklyn: {count}\n")
-
 import requests
-import csv
 
 url = 'https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv'
 
-r = requests.get(url)
-csvfile = 'taxi_zone_lookup.csv'
+response = requests.get(url)
 
+with open('/root/taxi_zone_lookup.csv', 'wb') as f:
+    f.write(response.content)
 
-with open(csvfile, 'wb') as file:
-    file.write(r.content)
+file = open('/root/taxi_zone_lookup.csv', 'r')
+lines = file.readlines()
+file.close()
 
+lines = lines[1:]
+lines.sort()
 
-with open(csvfile, 'r') as file:
-    reader = csv.reader(file)
-    header = next(reader)
-    data = list(reader)  
+print(len(lines))
 
+boroughs = set()
 
-total_records = len(data)
-uniqueborough = sorted(set(row[1] for row in data)) 
+for line in lines:
+    line = line.split(',')
+    boroughs.add(line[1])
 
-count = 0
-for row in data:
-    if row[1] == 'Brooklyn':  
-        count += 1
+print(boroughs)
 
+brooklyn = 0
 
-output_file = 'taxi_zone_output.txt' 
-with open(output_file, 'w') as f:
-    f.write(f"Total Records: {total_records}\n")
-    f.write(f"Unique Boroughs: {', '.join(uniqueborough)}\n")
-    f.write(f"Records for Brooklyn: {count}\n")
+for line in lines:
+    line = line.split(',')
+    if line[1] == '"Brooklyn"':
+        brooklyn += 1
 
-print(f"Data saved to {output_file}")
+print(brooklyn)
+
+output = open('/root/taxi_zone_output.txt', 'w') 
+
+output.write(f'Total number of records: {len(lines)}\n')
+output.write(f'Unique boroughs: {boroughs}\n')
+output.write(f'Number of records for Brooklyn: {brooklyn}\n')
+
+output.close()
